@@ -6,6 +6,10 @@ const app = express();
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
 const port = process.env.PORT || 5000;
+// Static Files
+app.use(express.static("public"));
+// Example for other olders
+app.use("/css", express.static(__dirname + "public/css"));
 // ======================================dotenv ==================================
 dotenv.config({ path: "./config.env" });
 require("./database/conn");

@@ -19,7 +19,7 @@ const Signup = () => {
   const PostData = async (e) => {
     e.preventDefault();
 
-    const { name, email, phone,password, cpassword } = user;
+    const { name, email,phone,password, cpassword } = user;
 
     const res = await fetch("/signup", {
       method: "POST",
@@ -82,11 +82,11 @@ const Signup = () => {
       </div>
       <div class="field input-field">
         <input type="password"
-                    name="work"
-                    id="work"
+                    name="password"
+                    id="password"
                     placeholder=" Your password"
                     autoComplete="off"
-                    value={user.work}
+                    value={user.password}
                     onChange={handleinputs}/>
         <label>password</label>
       </div>

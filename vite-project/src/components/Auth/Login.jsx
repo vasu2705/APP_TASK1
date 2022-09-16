@@ -43,8 +43,6 @@ const Auth = () => {
     <form action="" method="POST">
       <div class="field input-field">
         <input  type="text"
-                    name="your_name"
-                    id="your_name"
                     placeholder="Your Name"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}/>
@@ -52,8 +50,6 @@ const Auth = () => {
       </div>
       <div class="field input-field">
         <input  type="password"
-                    name="your_pass"
-                    id="your_pass"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setpassword(e.target.value)}/>

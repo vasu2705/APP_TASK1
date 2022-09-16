@@ -17,18 +17,6 @@ const Forgot = () => {
           email
         }),
       });
-  
-      const data = await res.json();
-  
-      if (!data || res.status === 400) {
-        window.alert("invalid hai bhai tu");
-        console.log("invalid credentials");
-      } else {
-        dispatch({ type: "USER", payload: true });
-        window.alert("perfect hai bhai tu");
-        console.log("successful credentials");
-       Navigate("/");
-      }
     };
   return (
    <>

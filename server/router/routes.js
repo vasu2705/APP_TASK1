@@ -1,8 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
-var nodemailer=require("nodemailer")
+var nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+let alert = require("alert");
 require("../database/conn");
 const authenticate = require("../middleware/authenticate");
 const User = require("../models/userSchema");
@@ -76,7 +77,7 @@ router.post("/forgot", async (req, res) => {
     return res.status(400).json({ error: "please fill data" });
   }
   try {
-     const userForgot = await User.findOne({ _id: id });
+    const userForgot = await User.findOne({ email: email });
     if (!userForgot) {
       return res.status(400).json({ error: "User Not exists" });
     }
@@ -88,30 +89,31 @@ router.post("/forgot", async (req, res) => {
     );
     const link = `http://localhost:5000/forgot/${userForgot._id}/${token}`;
     var transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user:process.env.EMAIL_MAIL,
-        pass: process.env.EMAIL_PASSWORD
-      }
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
-    
+
     var mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: 'Reset password',
-      text:link
+      subject: "Reset password",
+      text: link,
     };
-    
-    transporter.sendMail(mailOptions, function(error, info){
+
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         console.log(error);
       } else {
-        console.log('Email sent: ' + info.response);
+        console.log("Email sent: " + info.response);
       }
     });
-    // res.status(201).json({
-    //   link: `http://localhost:5000/forgot/${userForgot._id}/${token}`,
-    // });
+    console.log(link);
+    res.status(201).json({
+      link: `http://localhost:5000/forgot/${userForgot._id}/${token}`,
+    });
   } catch (err) {
     console.log(err);
   }
@@ -120,7 +122,7 @@ router.get("/forgot/:id/:token", async (req, res) => {
   const { id, token } = req.params;
   const userForgot = await User.findOne({ _id: id });
   if (!userForgot) {
-    return res.json({ status: "NOt recognised" });
+    return res.json({ status: "Not recognised" });
   }
   const secret = SECRET_KEY + userForgot.password;
   try {
@@ -132,7 +134,10 @@ router.get("/forgot/:id/:token", async (req, res) => {
 });
 router.post("/forgot/:id/:token", async (req, res) => {
   const { id, token } = req.params;
-  const { password } = req.body;
+  const { password, confirmpassword } = req.body;
+  if (password !== confirmpassword) {
+    alert("password must be same");
+  }
   const userForgot = await User.findOne({ _id: id });
   if (!userForgot) {
     return res.json({ status: "NOt recognised" });
@@ -141,16 +146,19 @@ router.post("/forgot/:id/:token", async (req, res) => {
   try {
     const verify = jwt.verify(token, secret);
     const encrPASS = await bcrypt.hash(password, 12);
-    await User.updateOne(
+    const encrPASS1 = await bcrypt.hash(password, 12);
+    await User.updateMany(
       {
         _id: id,
       },
       {
         $set: {
           password: encrPASS,
+          confirmpassword: encrPASS1,
         },
       }
     );
+
     // res.status(200).json({sucess:"done"})
     res.render("index", { email: verify.email, status: "verified" });
   } catch (err) {
